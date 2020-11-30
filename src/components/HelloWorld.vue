@@ -4,14 +4,29 @@
   <p>{{counter}}</p>
   <p>{{doubleCounter}}</p>
   <p ref="desc"></p>
+  <ModelButton/>
+  <Emits @my-click="myClick"/>
 </template>
 
 <script>
 import { reactive, computed, onMounted,onUnmounted, ref, toRefs, watch } from 'vue'
+import ModelButton from './ModelButton.vue'
+import Emits from './Emits.vue'
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  components: {
+    ModelButton,
+    Emits
+  },
+  methods:{
+    myClick() {
+      console.log('====================================');
+      console.log('自定义事件');
+      console.log('====================================');
+    }
   },
   setup() {
     const {counter, doubleCounter} = useCounter()
@@ -24,7 +39,7 @@ export default {
       const p = desc.value
       p.textContent = `counter change from ${oldVal} to ${val}`
     })
-
+    
     return {counter, doubleCounter, msg2, desc}
   }
 }
