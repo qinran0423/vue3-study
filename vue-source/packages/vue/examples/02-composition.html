@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <h1 @click="onclick">{{ msg}}</h1>
+    <p @click="add">{{count}}</p>
+    <p>{{doubleCount}}</p>
+  </div>
+
+  <script src="../dist/vue.global.js"></script>
+
+  <script>
+    const { createApp, reactive, onMounted, computed, ref, toRefs, watch, watchEffect} = Vue
+     const app = createApp({
+      setup() {
+        //  独立的响应式模块reactive
+        //  创建响应式对象, 代理对象proxy
+        const state = reactive({
+          msg: 'hello, vue3',
+          
+        })
+
+        const count = ref(0)
+        const doubleCount = computed(() => {
+            return count.value *2
+          })
+        function onclick() {
+          console.log('click me');
+        }
+        function add() {
+          count.value++ 
+        }
+
+        onMounted(() => {
+          console.log('mounted');
+        })
+
+        // watch, watchEffect
+        watch(count, (newval, oldval) => {
+          console.log(newval, oldval);
+        })
+
+
+        watchEffect(() => {
+          console.log(`count变化了`, count.value);
+        })
+
+        // return 的对象作为render函数的上下文
+        return { ...toRefs(state), onclick, count, doubleCount, add }
+      }
+      
+    }).mount('#app')
+
+  </script>
+</body>
+</html>
