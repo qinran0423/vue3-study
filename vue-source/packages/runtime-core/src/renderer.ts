@@ -388,6 +388,8 @@ export const setRef = (
  * })
  * ```
  */
+
+//  获取渲染器的实例
 export function createRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -446,8 +448,8 @@ function baseCreateRenderer(
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
   const patch: PatchFn = (
-    n1,
-    n2,
+    n1, // 旧vnode
+    n2, // 新vnode
     container,
     anchor = null,
     parentComponent = null,
@@ -466,7 +468,8 @@ function baseCreateRenderer(
       optimized = false
       n2.dynamicChildren = null
     }
-
+    
+    // 根据最新vnode类型做相应的处理
     const { type, ref, shapeFlag } = n2
     switch (type) {
       case Text:
@@ -507,6 +510,8 @@ function baseCreateRenderer(
             optimized
           )
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
+          // 首次初始化走的这个分支
+          //  因为传入的是一个对象
           processComponent(
             n1,
             n2,
@@ -1195,6 +1200,7 @@ function baseCreateRenderer(
     isSVG: boolean,
     optimized: boolean
   ) => {
+    // n1为空 表示哦初始化
     if (n1 == null) {
       if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
         ;(parentComponent!.ctx as KeepAliveContext).activate(
@@ -1205,6 +1211,7 @@ function baseCreateRenderer(
           optimized
         )
       } else {
+        //  走挂载流程
         mountComponent(
           n2,
           container,
@@ -1216,12 +1223,14 @@ function baseCreateRenderer(
         )
       }
     } else {
+      // 走更新流程
       updateComponent(n1, n2, optimized)
     }
   }
 
+  // 初始化挂载
   const mountComponent: MountComponentFn = (
-    initialVNode,
+    initialVNode, // 初始化vnode
     container,
     anchor,
     parentComponent,
@@ -1334,6 +1343,7 @@ function baseCreateRenderer(
   ) => {
     // create reactive effect for rendering
     instance.update = effect(function componentEffect() {
+      // 未挂载，此时执行初始化流程
       if (!instance.isMounted) {
         let vnodeHook: VNodeHook | null | undefined
         const { el, props } = initialVNode
@@ -1352,6 +1362,7 @@ function baseCreateRenderer(
         if (__DEV__) {
           startMeasure(instance, `render`)
         }
+        // 获取子树vnode
         const subTree = (instance.subTree = renderComponentRoot(instance))
         if (__DEV__) {
           endMeasure(instance, `render`)
@@ -1375,6 +1386,7 @@ function baseCreateRenderer(
           if (__DEV__) {
             startMeasure(instance, `patch`)
           }
+          // 转化前面获取的vnode 为 node
           patch(
             null,
             subTree,
@@ -2188,10 +2200,12 @@ function baseCreateRenderer(
 
   const render: RootRenderFunction = (vnode, container) => {
     if (vnode == null) {
+      // 卸载
       if (container._vnode) {
         unmount(container._vnode, null, null, true)
       }
     } else {
+      // 更新
       patch(container._vnode || null, vnode, container)
     }
     flushPostFlushCbs()
@@ -2219,6 +2233,13 @@ function baseCreateRenderer(
       Element
     >)
   }
+  /*
+    所谓渲染器，其实就是一个对象，包含三个属性：
+    render => 渲染函数
+    hydrate => 注水 用于ssr
+    createApp => 实例创建函数
+
+  */ 
 
   return {
     render,

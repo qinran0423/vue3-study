@@ -528,6 +528,7 @@ export function setupComponent(
   initProps(instance, props, isStateful, isSSR)
   initSlots(instance, children)
 
+  // 判断组件是否是stateful,然后做相应处理
   const setupResult = isStateful
     ? setupStatefulComponent(instance, isSSR)
     : undefined
@@ -539,6 +540,7 @@ function setupStatefulComponent(
   instance: ComponentInternalInstance,
   isSSR: boolean
 ) {
+  // 拿出当前类型
   const Component = instance.type as ComponentOptions
 
   if (__DEV__) {
@@ -674,7 +676,7 @@ function finishComponentSetup(
       instance.render = Component.render as InternalRenderFunction
     }
   } else if (!instance.render) {
-    // could be set from setup()
+    // 如果没有渲染函数，则通过编译器编译一个
     if (compile && Component.template && !Component.render) {
       if (__DEV__) {
         startMeasure(instance, `compile`)
@@ -702,6 +704,7 @@ function finishComponentSetup(
   }
 
   // support for 2.x options
+  // 通过单独解析options选项兼容之前版本
   if (__FEATURE_OPTIONS_API__) {
     currentInstance = instance
     pauseTracking()
