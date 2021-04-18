@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/vue@next"></script>
+</head>
+<body>
+  <div id="counter">
+    Counter: {{ counter }}
+    <span v-bind:title="message1">
+      鼠标悬停几秒钟查看此处动态绑定的提示信息！
+    </span>
+    <p>{{ message }}</p>
+    <input v-model="message" />
+    <button v-on:click="reverseMessage">反转 Message</button>
+    <span v-if="seen">现在你看到我了</span>
+  </div>
+  <script>
+    const Counter = {
+      data() {
+        return {
+          counter: 0,
+          message1: 'You loaded this page on ' + Math.random(),
+          message: 'Hello Vue.js!',
+          seen: true
+        }
+      },
+      methods: {
+        reverseMessage(){
+
+          this.message = this.message.split('')
+                                      .reverse()
+                                      .join('')
+
+        }
+      },
+      mounted() {
+        setInterval(() => {
+          this.counter++
+        }, 1000)
+      },
+    }
+
+    Vue.createApp(Counter).mount('#counter')
+  </script>
+</body>
+</html>
