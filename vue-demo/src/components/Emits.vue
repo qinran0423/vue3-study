@@ -1,15 +1,10 @@
 <template>
-  <div @click="$emit('my-click')">
+  <div @click="$emit('myclick')">
     自定义事件
   </div>
 </template>
 
 <script>
-  export default {
-    
-  }
+export default {
+}
 </script>
-
-<style scoped>
-
-</style>

@@ -5,7 +5,7 @@
   <p>{{doubleCounter}}</p>
   <p ref="desc"></p>
   <ModelButton/>
-  <Emits @my-click="myClick"/>
+  <Emits @myclick="myClick"/>
 </template>
 
 <script>
