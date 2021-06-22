@@ -1,0 +1,32 @@
+<div id="app">
+    <h3>{{title}}</h3>
+    <h3>{{state.title}}</h3>
+</div>
+
+<script src="https://unpkg.com/vue@next"></script>
+
+<script>
+    // 1.函数式方式获取实例 : 类型的支持会更好，迎合ts
+    // 2. 简化、标准化、一致性: render函数，sync修饰符删除，指令定义，v-model调整
+    // 3. tree-shaking
+    // 4. 复用性：composition api
+    // 5. 性能优化： 响应式、编译期优化
+    // 6. 扩展性：自定义渲染器
+    const {createApp, reactive} = Vue
+    const app = createApp({
+        data() {
+            return {
+                title: 'hello, vue3!'
+            }
+        },
+        setup() {
+            return {
+                state: reactive({
+                    title: 'hello, vue3!!!!!!'
+                })
+            }
+        }
+    })
+
+    app.mount('#app')
+</script>
