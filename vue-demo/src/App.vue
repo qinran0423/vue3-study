@@ -4,7 +4,8 @@
   <!-- <Model/> -->
   <!-- <countdown></countdown> -->
   <!-- <Comp></Comp> -->
-  <Ref></Ref>
+  <!-- <Ref></Ref> -->
+  <Provide></Provide>
 </template>
 
 <script>
@@ -13,6 +14,7 @@ import countdown from './components/countdown.vue'
 import Model from './components/Model.vue'
 import Comp from './components/Comp.vue';
 import Ref from './components/Ref.vue';
+import Provide from './components/Provide.vue';
 export default {
   name: 'App',
   components: {
@@ -20,7 +22,8 @@ export default {
     countdown,
     Model,
     Comp,
-    Ref
+    Ref,
+    Provide
   }
 }
 </script>
