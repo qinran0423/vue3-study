@@ -1,6 +1,5 @@
 <div id="app">
 	<h3>{{title}}</h3>
-	<h3>{{state.title}}</h3>
 </div>
 
 <script>
@@ -13,8 +12,32 @@
 					if(!options.render) {
 						options.render = this.complie(parent.innerHTML);
 					}
+					
+					// 兼容options api
+					if (options.setup) {
+						this.setupstate = options.setup()
+					} else {
+						this.data = options.data()
+					}
 
-					const el = options.render.call(options.data())
+					this.proxy = new Proxy(this, {
+						get(target, key) {
+							if(key in target.setupstate) {
+								return target.setupstate[key]
+							} else {
+								return target.data[key]
+							}
+						},
+						set(target, key, val) {
+							if(key in target.setupstate) {
+								target.setupstate[key] = val
+							} else {
+								target.data[key] = val
+							}
+						}
+					})
+
+					const el = options.render.call(this.proxy)
 
 					parent.innerHTML = '';
 					parent.appendChild(el);
@@ -50,11 +73,9 @@
 			}
 		},
 		setup() {
-			// return {
-			//     state: reactive({
-			//         title: 'hello, vue3!!!!!!'
-			//     })
-			// }
+			return {
+				title: 'hello, vue3!!!!!!'
+			}
 		}
 	})
 
