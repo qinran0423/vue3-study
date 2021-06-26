@@ -1,0 +1,58 @@
+<div id="app">
+	<h3>{{state.title}}</h3>
+	<p>{{state2.counter}}</p>
+</div>
+
+<script src="https://unpkg.com/vue@next"></script>
+
+<script>
+	const {
+		createApp,
+		reactive,
+		onMounted
+	} = Vue
+
+	function useTitle() {
+		const state = reactive({
+			title: 'hello, vue3!!!!!!'
+		})
+
+		onMounted(() => {
+			state.title = 'vue3, hello'
+		})
+
+		setTimeout(() => {
+			state.title = 'TITLE 2S'
+		}, 2000)
+
+		return state
+	}
+
+
+	function useCounter() {
+		const state2 = reactive({
+			counter: 0
+		})
+
+		onMounted(() => {
+			state2.counter = 1
+		})
+
+		return state2
+	}
+
+	const app = createApp({
+
+		setup() {
+			const state = useTitle()
+			const state2 = useCounter()
+			// 上下文给render使用
+			return {
+				state,
+				state2
+			}
+		}
+	})
+
+	app.mount('#app')
+</script>

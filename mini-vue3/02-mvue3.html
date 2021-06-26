@@ -3,6 +3,73 @@
 </div>
 
 <script>
+	function reactive(obj) {
+		return new Proxy(obj, {
+			get(target, key) {
+				console.log(`访问了数据${target} : ${key}  = ${target[key]}`);
+				track(target, key);
+				return target[key]
+			},
+			set(target, key, val) {
+				console.log(`设置数据${target} : ${key}  为 ${val}`);
+				target[key] = val
+
+				trigger(target, key)
+			}
+		})
+	}
+
+	const effectStack = []
+	// 添加副作用
+	function effect(fn) {
+		// 如果fn中用到了响应式得数据，当他们发生了变化，fn会再次执行
+		// 称之为副作用函数
+		const eff = function () {
+			try {
+				effectStack.push(eff);
+				fn()
+			} finally {
+				effectStack.pop()
+			}
+		}
+		// 执行一次，触发依赖收集
+		eff();
+		return eff;
+	}
+
+
+	// 依赖收集函数
+	const targetMap = {}
+
+	function track(target, key) {
+		const effect = effectStack[effectStack.length - 1];
+		if (effect) {
+			let map = targetMap[target];
+			if (!map) {
+				map = targetMap[target] = {}
+			}
+
+			let deps = map[key]
+			if (!deps) {
+				deps = map[key] = [];
+			}
+
+			// 将副作用函数放入deps
+			if (deps.indexOf(effect) === -1) {
+				deps.push(effect)
+			}
+		}
+	}
+
+
+	function trigger(target, key) {
+		const map = targetMap[target];
+		if (map) {
+			const deps = map[key]
+			deps.forEach(dep => dep())
+		}
+	}
+
 	const Vue = {
 		createApp(options) {
 			const renderer = Vue.createRenderer({
@@ -15,7 +82,10 @@
 			});
 			return renderer.createApp(options)
 		},
-		createRenderer({querySelector, insert}) {
+		createRenderer({
+			querySelector,
+			insert
+		}) {
 			return {
 				createApp(options) {
 					return {
@@ -50,11 +120,16 @@
 								}
 							})
 
-							const el = options.render.call(this.proxy)
+							this.update = effect(() => {
+								const el = options.render.call(this.proxy)
 
-							parent.innerHTML = '';
-							// parent.appendChild(el);
-							insert(el, parent)
+								parent.innerHTML = '';
+								// parent.appendChild(el);
+								insert(el, parent)
+							})
+
+							this.update()
+
 
 						},
 						complie(template) {
@@ -69,30 +144,23 @@
 			}
 		}
 	}
-	
 </script>
 
 <script>
-	// 1.函数式方式获取实例 : 类型的支持会更好，迎合ts
-	// 2. 简化、标准化、一致性: render函数，sync修饰符删除，指令定义，v-model调整
-	// 3. tree-shaking
-	// 4. 复用性：composition api
-	// 5. 性能优化： 响应式、编译期优化
-	// 6. 扩展性：自定义渲染器
 	const {
-		createApp,
-		reactive
+		createApp
 	} = Vue
 	const app = createApp({
-		data() {
-			return {
-				title: 'hello, vue3!'
-			}
-		},
+
 		setup() {
-			return {
-				title: 'hello, vue3!!!!!!'
-			}
+			const state = reactive({
+				title: 'hello, vue3!!!'
+			})
+
+			setTimeout(() => {
+				state.title = 'vue3, hello!!!'
+			}, 2000);
+			return state
 		}
 	})
 
