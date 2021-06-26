@@ -5,54 +5,71 @@
 <script>
 	const Vue = {
 		createApp(options) {
+			const renderer = Vue.createRenderer({
+				querySelector(selector) {
+					return document.querySelector(selector)
+				},
+				insert(child, parent, achor) {
+					parent.insertBefore(child, achor || null)
+				}
+			});
+			return renderer.createApp(options)
+		},
+		createRenderer({querySelector, insert}) {
 			return {
-				mount(selector) {
-					const parent = document.querySelector(selector);
+				createApp(options) {
+					return {
+						mount(selector) {
+							const parent = querySelector(selector);
 
-					if(!options.render) {
-						options.render = this.complie(parent.innerHTML);
-					}
-					
-					// 兼容options api
-					if (options.setup) {
-						this.setupstate = options.setup()
-					} else {
-						this.data = options.data()
-					}
-
-					this.proxy = new Proxy(this, {
-						get(target, key) {
-							if(key in target.setupstate) {
-								return target.setupstate[key]
-							} else {
-								return target.data[key]
+							if (!options.render) {
+								options.render = this.complie(parent.innerHTML);
 							}
-						},
-						set(target, key, val) {
-							if(key in target.setupstate) {
-								target.setupstate[key] = val
+
+							// 兼容options api
+							if (options.setup) {
+								this.setupstate = options.setup()
 							} else {
-								target.data[key] = val
+								this.data = options.data()
+							}
+
+							this.proxy = new Proxy(this, {
+								get(target, key) {
+									if (key in target.setupstate) {
+										return target.setupstate[key]
+									} else {
+										return target.data[key]
+									}
+								},
+								set(target, key, val) {
+									if (key in target.setupstate) {
+										target.setupstate[key] = val
+									} else {
+										target.data[key] = val
+									}
+								}
+							})
+
+							const el = options.render.call(this.proxy)
+
+							parent.innerHTML = '';
+							// parent.appendChild(el);
+							insert(el, parent)
+
+						},
+						complie(template) {
+							return function render() {
+								const h3 = document.createElement('h3');
+								h3.textContent = this.title;
+								return h3;
 							}
 						}
-					})
-
-					const el = options.render.call(this.proxy)
-
-					parent.innerHTML = '';
-					parent.appendChild(el);
-					
-				},
-				complie(template) {
-					return function render() {
-						const h3 = document.createElement('h3');
-						h3.textContent =  this.title;
-						return h3;
 					}
 				}
 			}
 		}
 	}
+	
 </script>
 
 <script>
