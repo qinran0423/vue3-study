@@ -13,7 +13,6 @@
 			set(target, key, val) {
 				console.log(`设置数据${target} : ${key}  为 ${val}`);
 				target[key] = val
-
 				trigger(target, key)
 			}
 		})
@@ -70,6 +69,10 @@
 		}
 	}
 
+	function h(target, attr, children) {
+		return {target, attr, children}
+	}
+
 	const Vue = {
 		createApp(options) {
 			const renderer = Vue.createRenderer({
@@ -78,13 +81,17 @@
 				},
 				insert(child, parent, achor) {
 					parent.insertBefore(child, achor || null)
+				},
+				createElement(tag) {
+					return document.createElement(tag)
 				}
 			});
 			return renderer.createApp(options)
 		},
 		createRenderer({
 			querySelector,
-			insert
+			insert,
+			createElement
 		}) {
 			return {
 				createApp(options) {
@@ -121,22 +128,75 @@
 							})
 
 							this.update = effect(() => {
-								const el = options.render.call(this.proxy)
+								// const el = options.render.call(this.proxy)
 
-								parent.innerHTML = '';
-								// parent.appendChild(el);
-								insert(el, parent)
+								// parent.innerHTML = '';
+								// // parent.appendChild(el);
+								// insert(el, parent)
+
+								const vnode = options.render.call(this.proxy);
+								if(!this.isMounted) {
+									const el = this.createElm(vnode);
+									parent.innerHTML = '';
+									insert(el, parent)
+
+									this.isMounted = true;
+
+								} else {
+									this.patch(this._vnode, vnode)
+								}
+
+								this._vnode = vnode;
 							})
 
 							this.update()
 
 
 						},
+						createElm(vnode) {
+							const el = createElement(vnode.tag);
+							// todo props
+							if(typeof vnode.children === 'string') {
+								el.textContent = vnode.children
+							} else {
+								vnode.children.forEach(child => {
+									insert(this.createElm(child), el)
+								})
+							}
+							vnode.el = el
+							return el
+						},
+						patch(n1, n2) {
+							const el = n2.el = n1.el;
+							// 判断双方是否是相同节点
+							if(n1.tag === n2.tag) {
+								const oldCh = n1.children;
+								const newCh = n2.children;
+
+								if(typeof oldCh === 'string') {
+									if(typeof newCh === 'string') {
+										if(oldCh !== newCh) {
+											el.textContent = newCh
+										}
+									} else {
+										el.textContent = ''
+										newCh.forEach(child => insert(this.createElm(child), el))
+									}
+								} else {
+									if(typeof newCh === 'string') {
+										el.textContent = newCh
+									} else {
+										
+									}
+								}
+							}
+						},
 						complie(template) {
 							return function render() {
-								const h3 = document.createElement('h3');
-								h3.textContent = this.title;
-								return h3;
+								// const h3 = document.createElement('h3');
+								// h3.textContent = this.title;
+								// return h3;
+								return h('h3', null, this.title)
 							}
 						}
 					}
