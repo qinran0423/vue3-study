@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+
+  </div>
+
+  <script>
+    const Vue = {
+      createRenderer({querySelector, insert}) {
+        return {
+          createApp(options) {
+            // 返回App实例
+            return {
+              // 挂载
+              // 把选项中数据状态转换为dom追加到宿主中
+              mount(selector) {
+                const parent = querySelector(selector);
+
+                if (options.setup) {
+                  this.stateSetup = options.setup()
+                }
+
+                if (options.data) {
+                  this.data = options.data()
+                }
+
+
+                this.proxy = new Proxy(this, {
+                  get(target, key) {
+                    if (key in target.stateSetup) {
+                      return target.stateSetup[key]
+                    } else {
+                      return target.data[key]
+                    }
+                  }
+                })
+
+                if (!options.render) {
+                  options.render = this.compile(parent.innerHTML)
+                }
+                const el = options.render.call(this.proxy)
+                parent.innerHTML = ''
+                insert(el, parent)
+                // parent.appendChild(el)
+              },
+              compile(template) {
+                return function () {
+                  const h3 = document.createElement('h3')
+                  h3.textContent = this.title1;
+
+                  return h3;
+                }
+              }
+            }
+
+          }
+        }
+      },
+      createApp(options) {
+        // 返回App实例
+        const renderer = this.createRenderer({
+          querySelector(selector) {
+            return document.querySelector(selector)
+          },
+          insert(el, parent, anchor) {
+            parent.insertBefore(el, anchor || null)
+          }
+        })
+        return renderer.createApp(options)
+      }
+    }
+  </script>
+
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          title1: 'Options'
+        }
+      },
+      setup() {
+        // const state = Vue.reactive({
+        //   title2: 'Composiiton'
+        // })
+
+        return {
+          title2: 'Composition'
+        }
+      }
+    })
+
+    app.mount('#app')
+  </script>
+</body>
+
+</html>
