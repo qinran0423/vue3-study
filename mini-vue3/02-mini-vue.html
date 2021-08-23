@@ -14,8 +14,23 @@
   </div>
 
   <script>
+    function reactive(obj) {
+      return new Proxy(obj, {
+        get(target, key) {
+          return target[key]
+        },
+        set(target, key, val) {
+          target[key] = val;
+        }
+      }) 
+    }
+
+
     const Vue = {
-      createRenderer({querySelector, insert}) {
+      createRenderer({
+        querySelector,
+        insert
+      }) {
         return {
           createApp(options) {
             // 返回App实例
@@ -40,6 +55,13 @@
                       return target.stateSetup[key]
                     } else {
                       return target.data[key]
+                    }
+                  },
+                  set(target, key, val) {
+                    if (key in target.stateSetup) {
+                      target.stateSetup[key] = val
+                    } else {
+                      target.data[key] = val
                     }
                   }
                 })
