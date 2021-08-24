@@ -21,8 +21,16 @@
         },
         set(target, key, val) {
           target[key] = val;
+
+          app.update()
+
         }
-      }) 
+      })
+    }
+
+
+    function effect(fn) {
+
     }
 
 
@@ -69,15 +77,19 @@
                 if (!options.render) {
                   options.render = this.compile(parent.innerHTML)
                 }
-                const el = options.render.call(this.proxy)
-                parent.innerHTML = ''
-                insert(el, parent)
+                this.update = function () {
+                  const el = options.render.call(this.proxy)
+                  parent.innerHTML = ''
+                  insert(el, parent)
+                }
+
+                this.update()
                 // parent.appendChild(el)
               },
               compile(template) {
                 return function () {
                   const h3 = document.createElement('h3')
-                  h3.textContent = this.title1;
+                  h3.textContent = this.title2;
 
                   return h3;
                 }
@@ -111,13 +123,14 @@
         }
       },
       setup() {
-        // const state = Vue.reactive({
-        //   title2: 'Composiiton'
-        // })
+        const state = reactive({
+          title2: 'Composiiton'
+        })
 
-        return {
-          title2: 'Composition'
-        }
+        setTimeout(() => {
+          state.title2 = 'Hello'
+        }, 2000);
+        return state
       }
     })
 
