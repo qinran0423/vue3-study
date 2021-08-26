@@ -10,10 +10,18 @@
 
 <body>
   <div id="app">
-
+    <h1>{{title}}</h1>
   </div>
-
+  <!-- <script src="./reactive.js"></script> -->
+  <script src="./compiler.js"></script>
   <script>
+    // 1. 返回vnode函数
+
+    function h(tag, props, children) {
+      return { tag, props, children }
+    }
+
+
     function reactive(obj) {
       return new Proxy(obj, {
         get(target, key) {
@@ -33,14 +41,14 @@
     const effectStack = []
     // 建立依赖关系
     function effect(fn) {
-      const eff = function() {
-        try{  
+      const eff = function () {
+        try {
           effectStack.push(fn)
           fn()
         } finally {
           effectStack.pop()
         }
-        
+
       }
 
       eff()
@@ -49,18 +57,18 @@
     }
 
     // 将映射关系保存在map中
-    const targetMap = { }
+    const targetMap = {}
     // 建立映射关系
     function track(target, key) {
       const effect = effectStack[effectStack.length - 1];
-      if(effect) {
+      if (effect) {
         let map = targetMap[target]
-        if(!map) {
+        if (!map) {
           map = targetMap[target] = {}
         }
 
         let deps = map[key]
-        if(!deps) {
+        if (!deps) {
           deps = map[key] = []
         }
 
@@ -71,9 +79,9 @@
 
     function trigger(target, key) {
       const map = targetMap[target]
-      if(map) {
+      if (map) {
         const deps = map[key]
-        if(deps) {
+        if (deps) {
           deps.forEach(eff => eff())
         }
       }
@@ -83,7 +91,8 @@
     const Vue = {
       createRenderer({
         querySelector,
-        insert
+        insert,
+        createElement
       }) {
         return {
           createApp(options) {
@@ -121,26 +130,46 @@
                 })
 
                 if (!options.render) {
-                  options.render = this.compile(parent.innerHTML)
+                  options.render = compile(parent.innerHTML)
                 }
                 // 希望update函数是一个副作用函数
                 this.update = effect(() => {
-                  const el = options.render.call(this.proxy)
-                  parent.innerHTML = ''
-                  insert(el, parent)
+                  // const el = options.render.call(this.proxy)
+                  // parent.innerHTML = ''
+                  // insert(el, parent)
+                  const vnode = options.render(this.proxy)
+                  if(!this.isMounted) {
+                    const el = this.createElm(vnode)
+                    parent.innerHTML = ''
+                    insert(el, parent)
+                    this.isMounted = true
+                  } else {
+                    this.patch(this._vnode, vnode)
+                  }
                 })
 
                 // this.update()
                 // parent.appendChild(el)
               },
-              compile(template) {
-                return function () {
-                  const h3 = document.createElement('h3')
-                  h3.textContent = this.title2;
 
-                  return h3;
+              createElm(vnode) {
+                const el = createElement(vnode.tag)
+                if(typeof vnode.children === 'string') {
+                  el.textContent = vnode.children
+                } else {
+                  vnode.children.forEach(child => insert(this.createElm(child), el))
                 }
+                vnode.el = el
+                return el
               }
+              // compile(template) {
+              //   return function () {
+              //     const h3 = document.createElement('h3')
+              //     h3.textContent = this.title2;
+
+              //     return h3;
+              //   }
+              // }
             }
 
           }
@@ -154,6 +183,9 @@
           },
           insert(el, parent, anchor) {
             parent.insertBefore(el, anchor || null)
+          },
+          createElement(tag) {
+            return document.createElement(tag)
           }
         })
         return renderer.createApp(options)
@@ -166,17 +198,14 @@
     const app = Vue.createApp({
       data() {
         return {
-          title1: 'Options'
+          title: 'Options'
         }
       },
       setup() {
         const state = reactive({
-          title2: 'Composiiton'
+          title: 'Composiiton'
         })
 
-        setTimeout(() => {
-          state.title2 = 'Hello'
-        }, 2000);
         return state
       }
     })
