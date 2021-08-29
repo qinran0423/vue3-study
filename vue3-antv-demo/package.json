@@ -1,4 +1,5 @@
 {
+  "name": "vue3-antv-demo",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
@@ -6,12 +7,12 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.0.5"
+    "ant-design-vue": "^2.2.6",
+    "vue": "^3.2.6"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.2.5",
+    "@vitejs/plugin-vue": "^1.6.0",
     "@vue/compiler-sfc": "^3.0.5",
-    "sass": "^1.35.2",
-    "vite": "^2.4.2"
+    "vite": "^2.5.1"
   }
 }
