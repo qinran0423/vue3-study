@@ -1,4 +1,4 @@
-const { effect, reactive } = require('@vue/reactivity')
+import { effectWatch, reactive } from './core/reactivity/index.js'
 
 // let a = 10;
 // let b;
@@ -17,7 +17,7 @@ let a = reactive({
   value: 1
 });
 let b;
-effect(() => {
+effectWatch(() => {
   // 此函数会自动执行一次
   b = a.value + 10
   console.log(b);
@@ -25,3 +25,6 @@ effect(() => {
 
 // a的值发生了变化  effect中的函数将再次执行
 a.value = 30
+
+
+a.value = 50
