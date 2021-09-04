@@ -12,7 +12,7 @@ const { effect, reactive } = require('@vue/reactivity')
 // a = 20;
 // update()
 
-
+// 声明一个响应式的对象
 let a = reactive({
   value: 1
 });
