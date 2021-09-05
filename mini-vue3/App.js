@@ -33,10 +33,10 @@ export default {
     // div.innerText = context.state.count
     // return div
     return h('div', {
-      id: 'app - id',
+      id: 'app -' + context.state.count,
       class: 'showTime'
     },
-      [h('p', null, 'randy'), h('p', null, 'mick')])
+      [h('p', null, String(context.state.count)), h('p', null, 'mick')])
   },
   setup() {
     const state = reactive({
