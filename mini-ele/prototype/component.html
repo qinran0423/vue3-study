@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+    const {
+      createApp,
+      reactive,
+      computed,
+      watchEffect
+    } = Vue
+
+    const MyButton = {
+      namr: 'Mybutton',
+      data: function () {
+        return {
+          count: 0
+        }
+      },
+      template: '<button v-on:click="count++">click me {{count}}</button>'
+    }
+
+
+    // 添加为插件
+    MyButton.install = app => app.component('Mybutton', MyButton)
+
+    // 组件库
+    const Element = {
+      MyButton,
+      install: app => {
+        app.use(MyButton)
+      }
+    }
+
+
+    const MyComponent = {
+      template: '<my-button />'
+    }
+
+
+    createApp(MyComponent)
+      .use(Element)
+      .mount('#app')
+  </script>
+</body>
+
+</html>
