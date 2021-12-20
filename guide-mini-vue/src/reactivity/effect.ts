@@ -10,7 +10,6 @@ class ReactiveEffect {
   run() {
     activeEffect = this
     return this._fn()
-
   }
 }
 
@@ -57,9 +56,7 @@ export function effect(fn) {
 
   _effect.run()
 
-
   return _effect.run.bind(_effect)
-
 
 
 }

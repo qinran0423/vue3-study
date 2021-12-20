@@ -26,6 +26,7 @@ describe('effect', () => {
 
 
   it('runner', () => {
+    // effect -> 返回一个runner -> 执行runner 接受fn()的返回值
     let foo = 10
     const runner = effect(() => {
       foo++
