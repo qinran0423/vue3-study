@@ -12,7 +12,6 @@ describe('effect', () => {
     let nextAge
     effect(() => {
       nextAge = user.age + 1
-      console.log(nextAge);
 
     })
 

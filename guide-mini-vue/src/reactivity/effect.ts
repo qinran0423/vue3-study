@@ -53,7 +53,9 @@ export function track(target, key) {
   }
 
   dep.add(activeEffect)
-  activeEffect.deps.push(dep)
+  if (activeEffect) {
+    activeEffect.deps.push(dep)
+  }
 }
 
 
