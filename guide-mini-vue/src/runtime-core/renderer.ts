@@ -17,11 +17,21 @@ function patch(vnode, container) {
 
 }
 function processComponent(vnode: any, container: any) {
-  mountComponent(vnode)
+  mountComponent(vnode, container)
 }
 
-function mountComponent(vnode: any) {
+function mountComponent(vnode, container) {
   const instance = createComponentInstance(vnode)
+
   setupComponent(instance)
+
+  setupRenderEffect(instance, container)
+}
+
+function setupRenderEffect(instance, container) {
+  const subTree = instance.render()
+
+  patch(subTree, container)
+
 }
 
