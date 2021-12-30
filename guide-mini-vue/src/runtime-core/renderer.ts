@@ -1,8 +1,6 @@
 import { createComponentInstance, setupComponent } from "./component"
 
 
-
-
 export function render(vnode, container) {
 
   patch(vnode, container)
@@ -12,6 +10,10 @@ export function render(vnode, container) {
 
 function patch(vnode, container) {
 
+  // TODO 判断vnode是不是一个element
+  // 是element应该处理element
+
+  // processElement() 
 
   processComponent(vnode, container)
 
