@@ -12,12 +12,42 @@ function patch(vnode, container) {
 
   // TODO 判断vnode是不是一个element
   // 是element应该处理element
-
+  if (typeof vnode.type === 'string') {
+    processElement(vnode, container)
+  } else {
+    processComponent(vnode, container)
+  }
   // processElement() 
 
-  processComponent(vnode, container)
+}
+
+function processElement(vnode: any, container: any) {
+  mountElement(vnode, container)
 
 }
+
+function mountElement(vnode, container) {
+  const el = document.createElement(vnode.type)
+
+  const { children, props } = vnode
+  if (typeof children === 'string') {
+    el.textContent = children
+  } else if (Array.isArray(children)) {
+    children.forEach(v => patch(v, el))
+  }
+
+  for (const key in props) {
+    const val = props[key]
+    el.setAttribute(key, val)
+  }
+
+  container.append(el)
+
+}
+
+
+
+
 function processComponent(vnode: any, container: any) {
   mountComponent(vnode, container)
 }
