@@ -2,6 +2,23 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var publicPropertiesMap = {
+    $el: function (i) { return i.vnode.el; }
+};
+var PublicInstanceProxyHandlers = {
+    get: function (_a, key) {
+        var instance = _a._;
+        var setupState = instance.setupState;
+        if (key in setupState) {
+            return setupState[key];
+        }
+        var publicGetter = publicPropertiesMap[key];
+        if (publicGetter) {
+            return publicGetter(instance);
+        }
+    }
+};
+
 function createComponentInstance(vnode) {
     var component = {
         vnode: vnode,
@@ -19,17 +36,9 @@ function setupComponent(instance) {
 }
 function setupStatefulComponent(instance) {
     var Component = instance.vnode.type;
-    instance.proxy = new Proxy({}, {
-        get: function (target, key) {
-            var setupState = instance.setupState;
-            if (key in setupState) {
-                return setupState[key];
-            }
-            if (key === '$el') {
-                return instance.vnode.el;
-            }
-        }
-    });
+    instance.proxy = new Proxy({
+        _: instance
+    }, PublicInstanceProxyHandlers);
     var setup = Component.setup;
     if (setup) {
         var setupResult = setup();
@@ -82,16 +91,16 @@ function mountElement(vnode, container) {
 function processComponent(vnode, container) {
     mountComponent(vnode, container);
 }
-function mountComponent(vnode, container) {
-    var instance = createComponentInstance(vnode);
+function mountComponent(initialVnode, container) {
+    var instance = createComponentInstance(initialVnode);
     setupComponent(instance);
-    setupRenderEffect(instance, vnode, container);
+    setupRenderEffect(instance, initialVnode, container);
 }
-function setupRenderEffect(instance, vnode, container) {
+function setupRenderEffect(instance, initialVnode, container) {
     var proxy = instance.proxy;
     var subTree = instance.render.call(proxy);
     patch(subTree, container);
-    vnode.el = subTree.el;
+    initialVnode.el = subTree.el;
 }
 
 function createVNode(type, props, children) {
