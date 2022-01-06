@@ -58,10 +58,11 @@ function render(vnode, container) {
 function patch(vnode, container) {
     // TODO 判断vnode是不是一个element
     // 是element应该处理element
-    if (typeof vnode.type === 'string') {
+    var shapeFlag = vnode.shapeFlag;
+    if (shapeFlag & 1 /* ELEMENT */) {
         processElement(vnode, container);
     }
-    else {
+    else if (shapeFlag & 2 /* STATEFUL_COMPONENT */) {
         processComponent(vnode, container);
     }
     // processElement() 
@@ -71,11 +72,11 @@ function processElement(vnode, container) {
 }
 function mountElement(vnode, container) {
     var el = (vnode.el = document.createElement(vnode.type));
-    var children = vnode.children, props = vnode.props;
-    if (typeof children === 'string') {
+    var children = vnode.children, props = vnode.props, shapeFlag = vnode.shapeFlag;
+    if (shapeFlag & 4 /* TEXT_CHILDREN */) {
         el.textContent = children;
     }
-    else if (Array.isArray(children)) {
+    else if (shapeFlag & 8 /* ARRAY_CHILDREN */) {
         children.forEach(function (v) { return patch(v, el); });
     }
     for (var key in props) {
@@ -104,9 +105,19 @@ function createVNode(type, props, children) {
         type: type,
         props: props,
         children: children,
+        shapeFlag: getShapeFlag(type),
         el: null
     };
+    if (typeof children === 'string') {
+        vnode.shapeFlag |= 4 /* TEXT_CHILDREN */;
+    }
+    else if (Array.isArray(children)) {
+        vnode.shapeFlag |= 8 /* ARRAY_CHILDREN */;
+    }
     return vnode;
+}
+function getShapeFlag(type) {
+    return typeof type === 'string' ? 1 /* ELEMENT */ : 2 /* STATEFUL_COMPONENT */;
 }
 
 function createApp(rootComponent) {
