@@ -85,7 +85,15 @@ function mountElement(vnode, container) {
     }
     for (var key in props) {
         var val = props[key];
-        el.setAttribute(key, val);
+        console.log(key);
+        var isOn = function (key) { return /^on[A-Z]/.test(key); };
+        if (isOn(key)) {
+            var event_1 = key.slice(2).toLowerCase();
+            el.addEventListener(event_1, val);
+        }
+        else {
+            el.setAttribute(key, val);
+        }
     }
     container.append(el);
 }
@@ -124,6 +132,8 @@ function getShapeFlag(type) {
     return typeof type === 'string' ? 1 /* ELEMENT */ : 2 /* STATEFUL_COMPONENT */;
 }
 
+// 源码中这段是由渲染器的返回的
+// 渲染器中的createApp 是由createAppAPI返回的一个工厂函数
 function createApp(rootComponent) {
     return {
         mount: function (rootContainer) {
