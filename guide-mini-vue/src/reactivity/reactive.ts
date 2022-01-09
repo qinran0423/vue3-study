@@ -1,3 +1,4 @@
+import { isObject } from "../share"
 import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from "./baseHandlers"
 
 
@@ -29,7 +30,10 @@ export function isReadonly(value) {
 }
 
 function createActiveObject(raw: any, baseHandlers) {
-  return new Proxy(raw, baseHandlers)
+  if (!isObject(raw)) {
+    console.warn('target 必须是一个对象');
+    return new Proxy(raw, baseHandlers)
+  }
 }
 
 

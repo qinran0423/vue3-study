@@ -1,12 +1,108 @@
+var extend = Object.assign;
+var isObject = function (val) {
+    return val !== null && typeof val === 'object';
+};
+
+var targetMap = new Map();
+function trigger(target, key) {
+    var depsMap = targetMap.get(target);
+    var dep = depsMap.get(key);
+    triggerEffects(dep);
+}
+function triggerEffects(dep) {
+    for (var _i = 0, dep_1 = dep; _i < dep_1.length; _i++) {
+        var effect_1 = dep_1[_i];
+        if (effect_1.scheduler) {
+            effect_1.scheduler();
+        }
+        else {
+            effect_1.run();
+        }
+    }
+}
+
+var get = createGetter();
+var set = createSetter();
+var readonlyGet = createGetter(true);
+var shallowReadonlyGet = createGetter(true, true);
+function createGetter(isReadonly, shallow) {
+    if (isReadonly === void 0) { isReadonly = false; }
+    if (shallow === void 0) { shallow = false; }
+    return function get(target, key) {
+        if (key === "__v_isReactive" /* IS_REACTIVE */) {
+            return !isReadonly;
+        }
+        else if (key === "__v_isReadonly" /* IS_READONLY */) {
+            return isReadonly;
+        }
+        var res = Reflect.get(target, key);
+        if (shallow) {
+            return res;
+        }
+        if (isObject(res)) {
+            return isReadonly ? readonly(res) : reactive(res);
+        }
+        return res;
+    };
+}
+function createSetter() {
+    return function set(target, key, value) {
+        var res = Reflect.set(target, key, value);
+        trigger(target, key);
+        return res;
+    };
+}
+var mutableHandlers = {
+    get: get,
+    set: set
+};
+var readonlyHandlers = {
+    get: readonlyGet,
+    set: function (target, key, value) {
+        console.warn("key: ".concat(key, "set \u5931\u8D25 \u56E0\u4E3Atarget\u662Freadonly:").concat(target));
+        return true;
+    }
+};
+var shallowReadonlyHandlers = extend({}, readonlyHandlers, {
+    get: shallowReadonlyGet
+});
+
+function reactive(raw) {
+    return createActiveObject(raw, mutableHandlers);
+}
+function readonly(raw) {
+    return createActiveObject(raw, readonlyHandlers);
+}
+function shallowReadonly(raw) {
+    return createActiveObject(raw, shallowReadonlyHandlers);
+}
+function createActiveObject(raw, baseHandlers) {
+    if (!isObject(raw)) {
+        console.warn('target 必须是一个对象');
+        return new Proxy(raw, baseHandlers);
+    }
+}
+
+function initProps(instance, rawProps) {
+    instance.props = rawProps || {};
+}
+
 var publicPropertiesMap = {
     $el: function (i) { return i.vnode.el; }
 };
 var PublicInstanceProxyHandlers = {
     get: function (_a, key) {
         var instance = _a._;
-        var setupState = instance.setupState;
+        var setupState = instance.setupState, props = instance.props;
         if (key in setupState) {
             return setupState[key];
+        }
+        var hasOwn = function (val, key) { return Object.prototype.hasOwnProperty.call(val, key); };
+        if (hasOwn(setupState, key)) {
+            return setupState[key];
+        }
+        else if (hasOwn(props, key)) {
+            return props[key];
         }
         var publicGetter = publicPropertiesMap[key];
         if (publicGetter) {
@@ -19,13 +115,14 @@ function createComponentInstance(vnode) {
     var component = {
         vnode: vnode,
         type: vnode.type,
-        setupState: {}
+        setupState: {},
+        props: {}
     };
     return component;
 }
 function setupComponent(instance) {
     // TODO
-    // initProps
+    initProps(instance, instance.vnode.props);
     // TODO
     // initSlots
     setupStatefulComponent(instance);
@@ -37,7 +134,7 @@ function setupStatefulComponent(instance) {
     }, PublicInstanceProxyHandlers);
     var setup = Component.setup;
     if (setup) {
-        var setupResult = setup();
+        var setupResult = setup(shallowReadonly(instance.props));
         handleSetupResult(instance, setupResult);
     }
 }
