@@ -5,7 +5,9 @@
       <!-- 顶部导航栏 -->
       <navbar />
       <!-- 内容区 -->
-      <app-main />
+      <!-- <app-main /> -->
+      <add />
+      <TodoList></TodoList>
     </div>
   </div>
 </template>
@@ -14,6 +16,8 @@
 import AppMain from "./components/AppMain.vue";
 import Navbar from "./components/Navbar.vue";
 // import Sidebar from "./components/Sidebar/index.vue";
+import Add from "../components/Add.vue";
+import TodoList from "../components/Todolist.vue";
 </script>
 
 <style lang="scss" scoped>
