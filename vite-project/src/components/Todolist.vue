@@ -13,39 +13,18 @@
       全选<input type="checkbox" v-model="allDone" />
       <span>{{ active }} / {{ all }}</span>
     </div>
+
+    <div>x:{{ x }}/ y: {{ y }}</div>
   </div>
 </template>
 
 <script setup>
+import { useTodos } from "../todolist.js";
 import { computed, ref } from "vue";
-let title = ref("");
-let todos = ref([{ title: "学习vue", done: false }]);
-function addTodo() {
-  todos.value.push({
-    title: title.value,
-    done: false,
-  });
-  title.value = "";
-}
+import { useMouse } from "../utils/mouse.js";
 
-function clear() {
-  todos.value = todos.value.filter((v) => !v.done);
-}
-
-let active = computed(() => {
-  return todos.value.filter((v) => !v.done).length;
-});
-let all = computed(() => todos.value.length);
-let allDone = computed({
-  get: function () {
-    return active.value === 0;
-  },
-  set: function (value) {
-    todos.value.forEach((todo) => {
-      todo.done = value;
-    });
-  },
-});
+let { x, y } = useMouse();
+let { title, todos, addTodo, clear, active, all, allDone } = useTodos();
 </script>
 
 <style lang="scss" scoped></style>

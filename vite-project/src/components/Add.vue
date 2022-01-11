@@ -7,13 +7,15 @@
 <script setup>
 import { ref } from "vue";
 let count = ref(1);
+let color = ref("red");
 function add() {
   count.value++;
+  color.value = Math.random() > 0.5 ? "blue" : "red";
 }
 </script>
 
 <style lang="scss" scoped>
 h1 {
-  color: red;
+  color: v-bind(color);
 }
 </style>
