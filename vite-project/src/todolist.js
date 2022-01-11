@@ -1,8 +1,18 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
+
+
+function useStorage(name, value = []) {
+  let data = ref(JSON.parse(localStorage.getItem(name) || value));
+  watchEffect(() => {
+    localStorage.setItem(name, JSON.stringify(data.value))
+  })
+
+  return data
+}
 
 export function useTodos() {
   let title = ref("");
-  let todos = ref([{ title: "学习vue", done: false }]);
+  let todos = useStorage('todos', [])
   function addTodo() {
     todos.value.push({
       title: title.value,
