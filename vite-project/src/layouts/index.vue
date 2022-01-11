@@ -8,6 +8,11 @@
       <!-- <app-main /> -->
       <add />
       <TodoList></TodoList>
+      <Rate :value="score" theme="black"></Rate>
+
+      <!-- <Rate :value="3"></Rate>
+      <Rate :value="4" theme="red"></Rate>
+      <Rate :value="1" theme="green"></Rate> -->
     </div>
   </div>
 </template>
@@ -17,7 +22,12 @@ import AppMain from "./components/AppMain.vue";
 import Navbar from "./components/Navbar.vue";
 // import Sidebar from "./components/Sidebar/index.vue";
 import Add from "../components/Add.vue";
-import TodoList from "../components/Todolist.vue";
+import TodoList from "../components/List.vue";
+import Rate from "../components/Rate.vue";
+
+import { ref } from "vue";
+
+let score = ref(3);
 </script>
 
 <style lang="scss" scoped>
