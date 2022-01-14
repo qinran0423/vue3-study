@@ -2,7 +2,7 @@ import { ref, computed, watchEffect } from 'vue'
 
 
 function useStorage(name, value = []) {
-  let data = ref(JSON.parse(localStorage.getItem(name) || value));
+  let data = ref(JSON.parse(localStorage.getItem(name)) || value);
   watchEffect(() => {
     localStorage.setItem(name, JSON.stringify(data.value))
   })
@@ -10,10 +10,22 @@ function useStorage(name, value = []) {
   return data
 }
 
+
+
+
 export function useTodos() {
+  let showModal = ref(false)
+
   let title = ref("");
   let todos = useStorage('todos', [])
   function addTodo() {
+    if (!title.value) {
+      showModal.value = true
+      setTimeout(() => {
+        showModal.value = false
+      }, 1500);
+      return
+    }
     todos.value.push({
       title: title.value,
       done: false,
@@ -40,5 +52,5 @@ export function useTodos() {
     },
   });
 
-  return { title, todos, addTodo, clear, active, all, allDone }
+  return { title, todos, addTodo, clear, active, all, allDone, showModal }
 }

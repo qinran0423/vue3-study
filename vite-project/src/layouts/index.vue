@@ -3,10 +3,10 @@
     <!-- 内容容器 -->
     <div class="main-container">
       <!-- 顶部导航栏 -->
-      <navbar />
+      <!-- <navbar /> -->
       <!-- 内容区 -->
       <!-- <app-main /> -->
-      <add />
+      <!-- <add /> -->
       <TodoList></TodoList>
       <!-- <Rate :value="score" theme="black"></Rate>
 
@@ -15,9 +15,10 @@
       <Rate :value="1" theme="green"></Rate>
       <Rate1 :value="3.5"></Rate1> -->
 
-      <Rate1 v-model="score"
+      <!-- <Rate1 v-model="score"
         ><h2>你的评分是：{{ score }}</h2></Rate1
-      >
+      > -->
+      <!-- <Draw></Draw> -->
     </div>
   </div>
 </template>
@@ -31,13 +32,13 @@ import TodoList from "../components/List.vue";
 import Rate from "../components/Rate.vue";
 import Rate1 from "../components/Rate1.vue";
 import { ref } from "vue";
+import Draw from "../components/Draw1.vue";
+// let score = ref(3);
 
-let score = ref(3);
-
-function update(num) {
-  score.value = num;
-  console.log("num", num);
-}
+// function update(num) {
+//   score.value = num;
+//   console.log("num", num);
+// }
 </script>
 
 <style lang="scss" scoped>
