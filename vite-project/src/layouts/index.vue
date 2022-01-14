@@ -8,11 +8,16 @@
       <!-- <app-main /> -->
       <add />
       <TodoList></TodoList>
-      <Rate :value="score" theme="black"></Rate>
+      <!-- <Rate :value="score" theme="black"></Rate>
 
-      <!-- <Rate :value="3"></Rate>
+      <Rate :value="3"></Rate>
       <Rate :value="4" theme="red"></Rate>
-      <Rate :value="1" theme="green"></Rate> -->
+      <Rate :value="1" theme="green"></Rate>
+      <Rate1 :value="3.5"></Rate1> -->
+
+      <Rate1 v-model="score"
+        ><h2>你的评分是：{{ score }}</h2></Rate1
+      >
     </div>
   </div>
 </template>
@@ -24,10 +29,15 @@ import Navbar from "./components/Navbar.vue";
 import Add from "../components/Add.vue";
 import TodoList from "../components/List.vue";
 import Rate from "../components/Rate.vue";
-
+import Rate1 from "../components/Rate1.vue";
 import { ref } from "vue";
 
 let score = ref(3);
+
+function update(num) {
+  score.value = num;
+  console.log("num", num);
+}
 </script>
 
 <style lang="scss" scoped>

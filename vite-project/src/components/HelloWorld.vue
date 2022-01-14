@@ -1,8 +1,7 @@
 <template>
   <h1>{{ msg }}</h1>
-  <p @click="$store.commit('add')">{{$store.state.counter}}</p>
+  <p @click="$store.commit('add')">{{ $store.state.counter }}</p>
   <p>
-   
     <Comp></Comp>
     <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
   </p>
@@ -16,7 +15,7 @@
 
 <script setup>
 import Comp from "@/components/Comp.vue";
-import { defineEmit, defineProps, reactive, useContext } from "vue";
+import { defineEmits, defineProps, reactive } from "vue";
 
 const props = defineProps({
   msg: String,
@@ -24,15 +23,15 @@ const props = defineProps({
 
 console.log(props);
 
-const ctx = useContext();
-console.log(ctx);
-ctx.expose({
-  someMethod() {
-    console.log("some message from HelloWorld");
-  },
-});
+// const ctx = useContext();
+// console.log(ctx);
+// ctx.expose({
+//   someMethod() {
+//     console.log("some message from HelloWorld");
+//   },
+// });
 
-const emit = defineEmit(["myclick"]);
+const emit = defineEmits(["myclick"]);
 
 const state = reactive({ count: 0 });
 const onclick = () => {
@@ -47,6 +46,4 @@ fetch("/api/getUsers")
   });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
