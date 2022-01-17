@@ -2,6 +2,18 @@ var extend = Object.assign;
 var isObject = function (val) {
     return val !== null && typeof val === 'object';
 };
+var hasOwn = function (val, key) { return Object.prototype.hasOwnProperty.call(val, key); };
+var camelize = function (str) {
+    return str.replace(/-(\w)/g, function (_, c) {
+        return c ? c.toUpperCase() : '';
+    });
+};
+var capitalize = function (str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
+var toHandlerKey = function (str) {
+    return str ? 'on' + capitalize(str) : '';
+};
 
 var targetMap = new Map();
 function trigger(target, key) {
@@ -83,6 +95,19 @@ function createActiveObject(raw, baseHandlers) {
     }
 }
 
+function emit(instance, event) {
+    var args = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        args[_i - 2] = arguments[_i];
+    }
+    console.log(event);
+    var props = instance.props;
+    console.log(props);
+    var handlerName = toHandlerKey(camelize(event));
+    var handler = props[handlerName];
+    handler && handler.apply(void 0, args);
+}
+
 function initProps(instance, rawProps) {
     instance.props = rawProps || {};
 }
@@ -97,7 +122,6 @@ var PublicInstanceProxyHandlers = {
         if (key in setupState) {
             return setupState[key];
         }
-        var hasOwn = function (val, key) { return Object.prototype.hasOwnProperty.call(val, key); };
         if (hasOwn(setupState, key)) {
             return setupState[key];
         }
@@ -116,8 +140,10 @@ function createComponentInstance(vnode) {
         vnode: vnode,
         type: vnode.type,
         setupState: {},
-        props: {}
+        props: {},
+        emit: function () { }
     };
+    component.emit = emit.bind(null, component);
     return component;
 }
 function setupComponent(instance) {
@@ -134,7 +160,9 @@ function setupStatefulComponent(instance) {
     }, PublicInstanceProxyHandlers);
     var setup = Component.setup;
     if (setup) {
-        var setupResult = setup(shallowReadonly(instance.props));
+        var setupResult = setup(shallowReadonly(instance.props), {
+            emit: instance.emit
+        });
         handleSetupResult(instance, setupResult);
     }
 }
@@ -178,7 +206,6 @@ function mountElement(vnode, container) {
     }
     for (var key in props) {
         var val = props[key];
-        console.log(key);
         var isOn = function (key) { return /^on[A-Z]/.test(key); };
         if (isOn(key)) {
             var event_1 = key.slice(2).toLowerCase();
@@ -211,7 +238,7 @@ function createVNode(type, props, children) {
         props: props,
         children: children,
         shapeFlag: getShapeFlag(type),
-        el: null
+        el: null,
     };
     if (typeof children === 'string') {
         vnode.shapeFlag |= 4 /* TEXT_CHILDREN */;

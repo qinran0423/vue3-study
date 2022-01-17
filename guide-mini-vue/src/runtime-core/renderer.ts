@@ -40,7 +40,6 @@ function mountElement(vnode, container) {
 
   for (const key in props) {
     const val = props[key]
-    console.log(key);
     const isOn = (key: string) => /^on[A-Z]/.test(key)
     if (isOn(key)) {
       const event = key.slice(2).toLowerCase()
