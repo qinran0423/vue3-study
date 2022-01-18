@@ -117,7 +117,8 @@ function initProps(instance, rawProps) {
 }
 
 var publicPropertiesMap = {
-    $el: function (i) { return i.vnode.el; }
+    $el: function (i) { return i.vnode.el; },
+    $slots: function (i) { return i.slots; }
 };
 var PublicInstanceProxyHandlers = {
     get: function (_a, key) {
@@ -139,12 +140,33 @@ var PublicInstanceProxyHandlers = {
     }
 };
 
+function initSlots(instance, children) {
+    // slots
+    var vnode = instance.vnode;
+    if (vnode.shapeFlag & 16 /* SLOT_CHILDREN */) {
+        normalizeObjectSlots(children, instance.slots);
+    }
+}
+function normalizeObjectSlots(children, slots) {
+    var _loop_1 = function (key) {
+        var value = children[key];
+        slots[key] = function (props) { return normalSlotValue(value(props)); };
+    };
+    for (var key in children) {
+        _loop_1(key);
+    }
+}
+function normalSlotValue(value) {
+    return Array.isArray(value) ? value : [value];
+}
+
 function createComponentInstance(vnode) {
     var component = {
         vnode: vnode,
         type: vnode.type,
         setupState: {},
         props: {},
+        slots: {},
         emit: function () { }
     };
     component.emit = emit.bind(null, component);
@@ -154,7 +176,7 @@ function setupComponent(instance) {
     // TODO
     initProps(instance, instance.vnode.props);
     // TODO
-    // initSlots
+    initSlots(instance, instance.vnode.children);
     setupStatefulComponent(instance);
 }
 function setupStatefulComponent(instance) {
@@ -250,6 +272,11 @@ function createVNode(type, props, children) {
     else if (Array.isArray(children)) {
         vnode.shapeFlag |= 8 /* ARRAY_CHILDREN */;
     }
+    if (vnode.shapeFlag & 2 /* STATEFUL_COMPONENT */) {
+        if (typeof children === 'object') {
+            vnode.shapeFlag |= 16 /* SLOT_CHILDREN */;
+        }
+    }
     return vnode;
 }
 function getShapeFlag(type) {
@@ -271,5 +298,15 @@ function h(type, props, children) {
     return createVNode(type, props, children);
 }
 
+function renderSlots(slots, name, props) {
+    var slot = slots[name];
+    if (slot) {
+        if (typeof slot === 'function') {
+            return createVNode('div', {}, slot(props));
+        }
+    }
+}
+
 exports.createApp = createApp;
 exports.h = h;
+exports.renderSlots = renderSlots;
