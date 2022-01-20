@@ -7,7 +7,7 @@
       <!-- 内容区 -->
       <!-- <app-main /> -->
       <!-- <add /> -->
-      <TodoList></TodoList>
+      <!-- <TodoList></TodoList> -->
       <!-- <Rate :value="score" theme="black"></Rate>
 
       <Rate :value="3"></Rate>
@@ -19,6 +19,8 @@
         ><h2>你的评分是：{{ score }}</h2></Rate1
       > -->
       <!-- <Draw></Draw> -->
+      <!-- <Heading :level="3">hello geekbang</Heading> -->
+      <Todo></Todo>
     </div>
   </div>
 </template>
@@ -33,6 +35,8 @@ import Rate from "../components/Rate.vue";
 import Rate1 from "../components/Rate1.vue";
 import { ref } from "vue";
 import Draw from "../components/Draw1.vue";
+import Heading from "../components/Heading";
+import Todo from "../components/Todo";
 // let score = ref(3);
 
 // function update(num) {
