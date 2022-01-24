@@ -21,22 +21,24 @@
       <!-- <Draw></Draw> -->
       <!-- <Heading :level="3">hello geekbang</Heading> -->
       <Todo></Todo>
+      <Count />
     </div>
   </div>
 </template>
 
 <script setup>
-import AppMain from "./components/AppMain.vue";
-import Navbar from "./components/Navbar.vue";
+// import AppMain from "./components/AppMain.vue";
+// import Navbar from "./components/Navbar.vue";
 // import Sidebar from "./components/Sidebar/index.vue";
-import Add from "../components/Add.vue";
-import TodoList from "../components/List.vue";
-import Rate from "../components/Rate.vue";
-import Rate1 from "../components/Rate1.vue";
-import { ref } from "vue";
-import Draw from "../components/Draw1.vue";
-import Heading from "../components/Heading";
+// import Add from "../components/Add.vue";
+// import TodoList from "../components/List.vue";
+// import Rate from "../components/Rate.vue";
+// import Rate1 from "../components/Rate1.vue";
+// import { ref } from "vue";
+// import Draw from "../components/Draw1.vue";
+// import Heading from "../components/Heading";
 import Todo from "../components/Todo";
+import Count from "../components/Count.vue";
 // let score = ref(3);
 
 // function update(num) {
